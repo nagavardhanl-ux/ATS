@@ -1,0 +1,2797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Resume Screening and Shortlisting | AIQoD ATS</title>
+  <meta name="description" content="AIQoD ATS reads every application your hiring team receives, scores each one against the role on weights you set, and returns a ranked shortlist with the reasoning behind every score.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Does it work with the hiring system we already use?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. It screens on top of an existing system. Candidate records, stages and tracking stay where they are."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What file formats can it read?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "PDF, DOCX and TXT."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How is the match score calculated?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Against the job description, using weights set per role across skills, experience and education. The skills that drove the score are shown with the result."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can we change the scoring weights?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. They are set by your team and configured per role."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What can the assistant answer?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Questions across the candidate pool in plain language, such as candidates in a given location or above an experience level. Answers come back as a filtered list or a link to the resume."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How long does it take to go live?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The first configuration goes live in a day, with measurable results typically inside three to six weeks."
+        }
+      }
+    ]
+  }
+  </script>
+  <style>
+    :root {
+      --brand:     #D74242;
+      --bg:        #080C16;
+      --surface:   #0B1221;
+      --text:      #9AA1AC;
+      --heading:   #FFFFFF;
+      --muted:     rgba(154, 161, 172, 0.6);
+      --line:      rgba(154, 161, 172, 0.12);
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-size: 17px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+      width: 100%;
+    }
+
+    /* Type Scale */
+    h1 {
+      font-size: clamp(40px, 5vw, 60px);
+      line-height: 1.05;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--heading);
+      margin-bottom: 24px;
+    }
+
+    h2 {
+      font-size: clamp(28px, 3.5vw, 40px);
+      line-height: 1.15;
+      font-weight: 700;
+      color: var(--heading);
+      margin-bottom: 24px;
+    }
+
+    h3 {
+      font-size: 20px;
+      line-height: 1.3;
+      font-weight: 600;
+      color: var(--heading);
+      margin-bottom: 12px;
+    }
+
+    p {
+      font-size: 17px;
+      line-height: 1.65;
+      color: var(--text);
+    }
+
+    p + p {
+      margin-top: 20px;
+    }
+
+    small, .text-small {
+      font-size: 14px;
+    }
+
+    .text-muted {
+      color: var(--muted);
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+    }
+
+    /* Layout Containers */
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      margin-left: auto;
+      margin-right: auto;
+      padding-left: 24px;
+      padding-right: 24px;
+    }
+
+    .prose-680 {
+      max-width: 680px;
+    }
+
+    .prose-620 {
+      max-width: 620px;
+    }
+
+    .prose-760 {
+      max-width: 760px;
+    }
+
+    /* Section Rhythm */
+    section {
+      width: 100%;
+      padding-top: 120px;
+      padding-bottom: 120px;
+      background-color: var(--bg);
+    }
+
+    section.bg-surface {
+      background-color: var(--surface);
+    }
+
+    section.bg-brand {
+      background-color: var(--brand);
+    }
+
+    section.section-short {
+      padding-top: 80px;
+      padding-bottom: 80px;
+    }
+
+    /* Buttons */
+    .btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      align-items: center;
+      margin-top: 32px;
+      margin-bottom: 16px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 14px 28px;
+      font-size: 15px;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      font-family: inherit;
+      border: 1px solid transparent;
+      box-shadow: 0 1px 3px rgba(0,0,0,.08);
+      transition: opacity 0.2s ease, transform 0.1s ease;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-brand {
+      background-color: var(--brand);
+      color: var(--heading);
+      border-color: var(--brand);
+    }
+
+    .btn-brand:hover {
+      opacity: 0.9;
+    }
+
+    .btn-outline {
+      background-color: transparent;
+      color: var(--heading);
+      border-color: var(--line);
+    }
+
+    .btn-outline:hover {
+      border-color: var(--text);
+    }
+
+    .btn-contrast-solid {
+      background-color: var(--heading);
+      color: var(--brand);
+      border-color: var(--heading);
+    }
+
+    .btn-contrast-solid:hover {
+      opacity: 0.92;
+    }
+
+    .btn-contrast-outline {
+      background-color: transparent;
+      color: var(--heading);
+      border-color: var(--heading);
+    }
+
+    .btn-contrast-outline:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    /* Placeholder Panel */
+    .placeholder-panel {
+      background-color: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .placeholder-panel.aspect-16-10 {
+      aspect-ratio: 16 / 10;
+      width: 100%;
+    }
+
+    .placeholder-name {
+      font-size: 14px;
+      font-variant: all-small-caps;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    /* =========================================================================
+       1. Hero
+       ========================================================================= */
+    .hero-split {
+      display: flex;
+      justify-content: center;
+    }
+
+    .hero-left {
+      max-width: 760px;
+      text-align: center;
+    }
+
+    .hero-left .btn-group {
+      justify-content: center;
+    }
+
+    .hero-subline {
+      font-size: 19px;
+      line-height: 1.6;
+      color: var(--text);
+    }
+
+    .hero-trust {
+      font-size: 14px;
+      color: var(--muted);
+      margin-top: 12px;
+    }
+
+    /* =========================================================================
+       2. Most applications never get read
+       ========================================================================= */
+    .read-head {
+      max-width: 820px;
+    }
+
+    .read-head h2 {
+      font-size: clamp(34px, 5vw, 60px);
+      line-height: 1.02;
+      letter-spacing: -0.03em;
+      text-wrap: balance;
+      margin-bottom: 20px;
+    }
+
+    .read-head h2 em {
+      font-style: normal;
+      color: var(--brand);
+    }
+
+    .read-lead {
+      font-size: 19px;
+      line-height: 1.6;
+      max-width: 60ch;
+      text-wrap: pretty;
+    }
+
+    /* The pile: every tile is one application */
+    .pile {
+      --cols: 32;
+      --n: 5;
+      --gap: 6px;
+      position: relative;
+      margin-top: 64px;
+    }
+
+    .pile-legend {
+      display: flex;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.01em;
+      margin-bottom: 14px;
+    }
+
+    .pile-legend span:first-child {
+      flex: 0 0 auto;
+      width: calc((100% - (var(--cols) - 1) * var(--gap)) / var(--cols) * var(--n) + (var(--n) - 1) * var(--gap));
+      color: var(--heading);
+      white-space: nowrap;
+    }
+
+    .pile-legend span:last-child {
+      padding-left: calc(var(--gap) + 14px);
+      color: var(--muted);
+    }
+
+    .pile-field {
+      position: relative;
+    }
+
+    .pile-grid {
+      display: grid;
+      grid-template-columns: repeat(var(--cols), 1fr);
+      gap: var(--gap);
+      -webkit-mask-image: linear-gradient(to right, #000 70%, transparent 100%);
+      mask-image: linear-gradient(to right, #000 70%, transparent 100%);
+    }
+
+    .tile {
+      aspect-ratio: 4 / 5;
+      border-radius: 3px;
+      border: 1px solid var(--line);
+      background-color: rgba(154, 161, 172, 0.03);
+      background-image:
+        linear-gradient(rgba(154, 161, 172, 0.16), rgba(154, 161, 172, 0.16)),
+        linear-gradient(rgba(154, 161, 172, 0.10), rgba(154, 161, 172, 0.10)),
+        linear-gradient(rgba(154, 161, 172, 0.10), rgba(154, 161, 172, 0.10));
+      background-size: 55% 2px, 70% 2px, 45% 2px;
+      background-position: 22% 26%, 22% 46%, 22% 60%;
+      background-repeat: no-repeat;
+    }
+
+    .tile.is-read {
+      border-color: rgba(215, 66, 66, 0.55);
+      background-color: rgba(215, 66, 66, 0.10);
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0.75)),
+        linear-gradient(rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0.35)),
+        linear-gradient(rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0.35));
+    }
+
+    .pile-frame {
+      position: absolute;
+      top: -8px;
+      bottom: -8px;
+      left: -8px;
+      width: calc((100% - (var(--cols) - 1) * var(--gap)) / var(--cols) * var(--n) + (var(--n) - 1) * var(--gap) + 16px);
+      border: 1px solid var(--brand);
+      border-radius: 8px;
+      pointer-events: none;
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .js .pile .tile {
+        opacity: 0;
+        transform: translateY(6px);
+        transition: opacity 500ms cubic-bezier(0.16, 1, 0.3, 1), transform 500ms cubic-bezier(0.16, 1, 0.3, 1);
+        transition-delay: var(--d, 0ms);
+      }
+
+      .js .pile .pile-frame {
+        opacity: 0;
+        transition: opacity 400ms ease 250ms;
+      }
+
+      .js .pile.is-in .tile {
+        opacity: 1;
+        transform: none;
+      }
+
+      .js .pile.is-in .pile-frame {
+        opacity: 1;
+      }
+    }
+
+    /* Three beats under the pile */
+    .read-beats {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1.25fr;
+      gap: 48px;
+      margin-top: 72px;
+    }
+
+    .beat {
+      border-top: 1px solid var(--line);
+      padding-top: 24px;
+    }
+
+    .beat h3 {
+      font-size: 18px;
+      margin-bottom: 10px;
+      text-wrap: balance;
+    }
+
+    .beat p {
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    .beat-key {
+      border-top-color: var(--brand);
+    }
+
+    .beat-key p {
+      font-size: 19px;
+      line-height: 1.5;
+      color: var(--heading);
+      text-wrap: pretty;
+    }
+
+    /* =========================================================================
+       3. What changes
+       ========================================================================= */
+    .change-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 4fr) minmax(0, 7fr);
+      gap: 72px;
+      align-items: start;
+    }
+
+    .change-intro {
+      position: sticky;
+      top: 96px;
+    }
+
+    .change-intro h2 {
+      font-size: clamp(34px, 4.4vw, 54px);
+      line-height: 1.04;
+      letter-spacing: -0.03em;
+      margin-bottom: 20px;
+    }
+
+    .change-intro p {
+      max-width: 34ch;
+      text-wrap: pretty;
+    }
+
+    .change-key {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 32px;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .change-key span {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .change-key span::before {
+      content: "";
+      width: 28px;
+      height: 0;
+      border-top: 2px solid var(--muted);
+    }
+
+    .change-key .key-now {
+      color: var(--muted);
+    }
+
+    .change-key .key-new {
+      color: var(--heading);
+    }
+
+    .change-key .key-new::before {
+      border-top-color: var(--brand);
+    }
+
+    .change-list {
+      list-style: none;
+    }
+
+    .change-row {
+      display: grid;
+      grid-template-columns: 132px minmax(0, 1fr);
+      gap: 24px;
+      padding: 36px 0;
+      border-top: 1px solid var(--line);
+    }
+
+    .change-row:last-child {
+      border-bottom: 1px solid var(--line);
+    }
+
+    .change-topic {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--brand);
+      padding-top: 4px;
+    }
+
+    .change-now {
+      position: relative;
+      display: inline;
+      font-size: 17px;
+      color: var(--muted);
+      background-image: linear-gradient(var(--muted), var(--muted));
+      background-repeat: no-repeat;
+      background-position: 0 55%;
+      background-size: 100% 1px;
+    }
+
+    .change-new {
+      margin-top: 10px;
+      font-size: clamp(22px, 2.3vw, 28px);
+      line-height: 1.25;
+      font-weight: 600;
+      letter-spacing: -0.015em;
+      color: var(--heading);
+      text-wrap: balance;
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .js .change-now {
+        background-size: 0% 1px;
+        transition: background-size 600ms cubic-bezier(0.65, 0, 0.35, 1), color 600ms ease;
+      }
+
+      .js .change-new {
+        opacity: 0;
+        transform: translateY(10px);
+        transition: opacity 600ms cubic-bezier(0.16, 1, 0.3, 1) 450ms, transform 600ms cubic-bezier(0.16, 1, 0.3, 1) 450ms;
+      }
+
+      .js .change-row.is-in .change-now {
+        background-size: 100% 1px;
+      }
+
+      .js .change-row.is-in .change-new {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    /* =========================================================================
+       4. How it works — CLICKABLE STEPS SECTION
+       ========================================================================= */
+    .how {
+      position: relative;
+    }
+
+    .how-intro {
+      margin-bottom: 48px;
+    }
+
+    .how-grid {
+      display: flex;
+      align-items: center;
+      gap: 48px;
+    }
+
+    .how-rail {
+      flex: 0 0 44%;
+      width: 44%;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .how-step {
+      opacity: 0.5;
+      border-left: 2px solid transparent;
+      padding: 16px 20px;
+      border-radius: 0 8px 8px 0;
+      cursor: pointer;
+      user-select: none;
+      background-color: transparent;
+      transition: opacity 250ms ease, border-color 250ms ease, background-color 200ms ease;
+    }
+
+    .how-step:hover {
+      opacity: 0.85;
+      background-color: var(--line);
+    }
+
+    .how-step:focus-visible {
+      outline: 2px solid var(--brand);
+      outline-offset: 2px;
+    }
+
+    .how-step-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .how-step h3 {
+      margin-bottom: 0;
+      display: inline;
+    }
+
+    .step-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 9999px;
+      border: 1px solid var(--brand);
+      color: var(--brand);
+      background-color: transparent;
+      font-size: 13px;
+      font-weight: 700;
+      flex-shrink: 0;
+      transition: background-color 250ms ease, color 250ms ease, border-color 250ms ease;
+    }
+
+    .step-chevron {
+      margin-left: auto;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      transition: color 250ms ease;
+    }
+
+    .step-chevron::after {
+      content: "";
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-right: 2px solid currentColor;
+      border-bottom: 2px solid currentColor;
+      transform: rotate(-45deg);
+      transition: transform 300ms ease;
+    }
+
+    .step-body {
+      color: var(--text);
+      font-size: 16px;
+      line-height: 1.6;
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      margin-top: 0;
+      transition: max-height 300ms cubic-bezier(0.4, 0, 0.2, 1), opacity 250ms ease, margin-top 250ms ease;
+    }
+
+    .step-body p {
+      margin: 0;
+      padding-top: 4px;
+    }
+
+    .how-panel {
+      flex: 0 0 calc(56% - 48px);
+      width: calc(56% - 48px);
+    }
+
+    .how-video-card {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      border-radius: 12px;
+      overflow: hidden;
+      background-color: var(--bg);
+      border: 1px solid var(--line);
+      box-shadow: 0 1px 3px rgba(0,0,0,.08);
+    }
+
+    .how-video-card video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0;
+      transition: opacity 250ms ease;
+      pointer-events: none;
+    }
+
+    /* CSS Keyed off section[data-active="1..5"] */
+    .how[data-active="1"] .how-step:nth-child(1),
+    .how[data-active="2"] .how-step:nth-child(2),
+    .how[data-active="3"] .how-step:nth-child(3),
+    .how[data-active="4"] .how-step:nth-child(4),
+    .how[data-active="5"] .how-step:nth-child(5) {
+      opacity: 1;
+      border-left: 2px solid var(--brand);
+      background-color: var(--line);
+    }
+
+    .how[data-active="1"] .how-step:nth-child(1) .step-badge,
+    .how[data-active="2"] .how-step:nth-child(2) .step-badge,
+    .how[data-active="3"] .how-step:nth-child(3) .step-badge,
+    .how[data-active="4"] .how-step:nth-child(4) .step-badge,
+    .how[data-active="5"] .how-step:nth-child(5) .step-badge {
+      background-color: var(--brand);
+      color: var(--heading);
+      border-color: var(--brand);
+    }
+
+    .how[data-active="1"] .how-step:nth-child(1) .step-chevron,
+    .how[data-active="2"] .how-step:nth-child(2) .step-chevron,
+    .how[data-active="3"] .how-step:nth-child(3) .step-chevron,
+    .how[data-active="4"] .how-step:nth-child(4) .step-chevron,
+    .how[data-active="5"] .how-step:nth-child(5) .step-chevron {
+      color: var(--brand);
+    }
+
+    .how[data-active="1"] .how-step:nth-child(1) .step-chevron::after,
+    .how[data-active="2"] .how-step:nth-child(2) .step-chevron::after,
+    .how[data-active="3"] .how-step:nth-child(3) .step-chevron::after,
+    .how[data-active="4"] .how-step:nth-child(4) .step-chevron::after,
+    .how[data-active="5"] .how-step:nth-child(5) .step-chevron::after {
+      transform: rotate(45deg);
+    }
+
+    .how[data-active="1"] .how-step:nth-child(1) .step-body,
+    .how[data-active="2"] .how-step:nth-child(2) .step-body,
+    .how[data-active="3"] .how-step:nth-child(3) .step-body,
+    .how[data-active="4"] .how-step:nth-child(4) .step-body,
+    .how[data-active="5"] .how-step:nth-child(5) .step-body {
+      max-height: 200px;
+      opacity: 1;
+      margin-top: 10px;
+    }
+
+    .how[data-active="1"] .how-video-card video:nth-child(1),
+    .how[data-active="2"] .how-video-card video:nth-child(2),
+    .how[data-active="3"] .how-video-card video:nth-child(3),
+    .how[data-active="4"] .how-video-card video:nth-child(4),
+    .how[data-active="5"] .how-video-card video:nth-child(5) {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* =========================================================================
+       5. Scoring you can explain
+       ========================================================================= */
+    .scoring-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      gap: 64px;
+      align-items: start;
+    }
+
+    .scoring-prose h2 {
+      font-size: clamp(34px, 4.4vw, 54px);
+      line-height: 1.04;
+      letter-spacing: -0.03em;
+      text-wrap: balance;
+      margin-bottom: 20px;
+    }
+
+    .scoring-prose > p {
+      max-width: 44ch;
+      text-wrap: pretty;
+    }
+
+    .weights {
+      margin-top: 40px;
+      padding-top: 28px;
+      border-top: 1px solid var(--line);
+    }
+
+    .weights-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--heading);
+      margin-bottom: 14px;
+    }
+
+    .role-switch {
+      display: inline-flex;
+      padding: 4px;
+      gap: 4px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      margin-bottom: 28px;
+    }
+
+    .role-switch button {
+      font: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text);
+      background: transparent;
+      border: 0;
+      border-radius: 7px;
+      padding: 8px 14px;
+      cursor: pointer;
+      transition: background-color 200ms ease, color 200ms ease;
+    }
+
+    .role-switch button:hover {
+      color: var(--heading);
+    }
+
+    .role-switch button[aria-pressed="true"] {
+      background-color: rgba(215, 66, 66, 0.14);
+      color: var(--heading);
+    }
+
+    .role-switch button:focus-visible,
+    .weight input:focus-visible {
+      outline: 2px solid var(--brand);
+      outline-offset: 2px;
+    }
+
+    .weight {
+      display: grid;
+      grid-template-columns: 112px minmax(0, 1fr) 48px;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .weight label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--heading);
+    }
+
+    .weight-swatch {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      flex: 0 0 auto;
+    }
+
+    .weight output {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--heading);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .weight input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 20px;
+      background: transparent;
+      cursor: pointer;
+    }
+
+    .weight input[type="range"]::-webkit-slider-runnable-track {
+      height: 2px;
+      background: var(--line);
+      border-radius: 2px;
+    }
+
+    .weight input[type="range"]::-moz-range-track {
+      height: 2px;
+      background: var(--line);
+      border-radius: 2px;
+    }
+
+    .weight input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      margin-top: -7px;
+      border-radius: 50%;
+      background: var(--heading);
+      border: 3px solid var(--bg);
+      box-shadow: 0 0 0 1px var(--swatch);
+    }
+
+    .weight input[type="range"]::-moz-range-thumb {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--heading);
+      border: 3px solid var(--bg);
+      box-shadow: 0 0 0 1px var(--swatch);
+    }
+
+    .weights-note {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 8px;
+    }
+
+    /* Ranked shortlist */
+    .ranking {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background-color: var(--surface);
+      padding: 8px;
+    }
+
+    .ranking-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 16px 20px 12px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .ranking-head strong {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--heading);
+    }
+
+    .ranking-list {
+      list-style: none;
+    }
+
+    .rank-card {
+      position: relative;
+      padding: 22px 20px;
+      border-radius: 10px;
+      background-color: var(--bg);
+      border: 1px solid var(--line);
+      transition: border-color 300ms ease;
+    }
+
+    .rank-card + .rank-card {
+      margin-top: 8px;
+    }
+
+    .rank-card.is-top {
+      border-color: rgba(215, 66, 66, 0.5);
+    }
+
+    .rank-top {
+      display: grid;
+      grid-template-columns: 28px minmax(0, 1fr) auto;
+      align-items: baseline;
+      gap: 12px;
+    }
+
+    .rank-pos {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .rank-card.is-top .rank-pos {
+      color: var(--brand);
+    }
+
+    .rank-name {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--heading);
+    }
+
+    .rank-meta {
+      font-size: 13px;
+      color: var(--muted);
+      margin-left: 8px;
+      font-weight: 400;
+    }
+
+    .rank-score {
+      font-size: 28px;
+      line-height: 1;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--heading);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .rank-score small {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--muted);
+      margin-left: 1px;
+    }
+
+    .rank-bar {
+      display: flex;
+      gap: 2px;
+      height: 6px;
+      margin: 16px 0 12px 40px;
+    }
+
+    .rank-bar span {
+      height: 100%;
+      border-radius: 2px;
+      transition: width 450ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .rank-why {
+      margin-left: 40px;
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--text);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .rank-why b {
+      font-weight: 600;
+      color: var(--heading);
+    }
+
+    .rank-skills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 10px 0 0 40px;
+    }
+
+    .rank-skills span {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text);
+      padding: 3px 8px;
+      border-radius: 4px;
+      border: 1px solid var(--line);
+    }
+
+    .ranking-foot {
+      padding: 14px 20px 10px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    /* Factor colours: one accent plus two neutrals */
+    .f-skills { background-color: var(--brand); }
+    .f-exp    { background-color: #C9CDD4; }
+    .f-edu    { background-color: #5B6270; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .rank-bar span { transition: none; }
+    }
+
+    /* =========================================================================
+       6. Reporting
+       ========================================================================= */
+    .reporting-intro {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 32px;
+      margin-bottom: 40px;
+    }
+
+    .reporting-intro h2 {
+      font-size: clamp(34px, 4.4vw, 54px);
+      line-height: 1.04;
+      letter-spacing: -0.03em;
+      margin-bottom: 16px;
+    }
+
+    .reporting-intro p {
+      max-width: 52ch;
+      text-wrap: pretty;
+    }
+
+    .report-note {
+      font-size: 13px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .report-grid {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .report-tile {
+      position: relative;
+      background-color: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 22px 22px 20px;
+      min-width: 0;
+    }
+
+    .span-7 { grid-column: span 7; }
+    .span-5 { grid-column: span 5; }
+    .span-4 { grid-column: span 4; }
+    .span-12 { grid-column: span 12; }
+
+    .tile-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .tile-head h3 {
+      font-size: 15px;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .tile-sub {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .tile-figure {
+      font-size: 32px;
+      line-height: 1;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--heading);
+    }
+
+    .tile-figure small {
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0;
+      color: var(--muted);
+      margin-left: 6px;
+    }
+
+    /* Line: job description uploads */
+    .line-chart {
+      position: relative;
+      height: 168px;
+      margin-top: 18px;
+    }
+
+    .line-chart svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+
+    .line-grid line {
+      stroke: var(--line);
+      stroke-width: 1;
+      vector-effect: non-scaling-stroke;
+    }
+
+    .line-path {
+      fill: none;
+      stroke: var(--brand);
+      stroke-width: 2;
+      stroke-linejoin: round;
+      stroke-linecap: round;
+      vector-effect: non-scaling-stroke;
+    }
+
+    .line-area {
+      fill: rgba(215, 66, 66, 0.10);
+    }
+
+    .line-dot {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      margin: -5px 0 0 -5px;
+      border-radius: 50%;
+      background-color: var(--brand);
+      box-shadow: 0 0 0 2px var(--bg);
+      pointer-events: none;
+    }
+
+    .line-dot.is-hover {
+      display: none;
+    }
+
+    .line-chart.is-hovering .line-dot.is-hover {
+      display: block;
+    }
+
+    .line-cross {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      background-color: rgba(154, 161, 172, 0.35);
+      display: none;
+      pointer-events: none;
+    }
+
+    .line-chart.is-hovering .line-cross {
+      display: block;
+    }
+
+    .line-hits {
+      position: absolute;
+      inset: 0;
+      display: flex;
+    }
+
+    .line-hits span {
+      flex: 1 1 0;
+    }
+
+    .axis-x {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+      font-size: 11px;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Columns: experience levels */
+    .cols {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 2px;
+      height: 168px;
+      margin-top: 18px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .col {
+      flex: 1 1 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      cursor: default;
+    }
+
+    .col-val {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 6px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .col-bar {
+      width: 100%;
+      max-width: 24px;
+      border-radius: 4px 4px 0 0;
+      background-color: var(--brand);
+      transition: opacity 150ms ease;
+    }
+
+    .col.is-peak .col-val {
+      color: var(--heading);
+      font-weight: 600;
+    }
+
+    .cols-x {
+      display: flex;
+      justify-content: space-between;
+      gap: 2px;
+      margin-top: 10px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .cols-x span {
+      flex: 1 1 0;
+      text-align: center;
+    }
+
+    /* Horizontal bars: skills, locations */
+    .hbars {
+      display: grid;
+      gap: 10px;
+    }
+
+    .hbar {
+      display: grid;
+      grid-template-columns: 84px minmax(0, 1fr) 36px;
+      align-items: center;
+      gap: 12px;
+      font-size: 13px;
+      cursor: default;
+    }
+
+    .hbar-label {
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .hbar-track {
+      height: 14px;
+    }
+
+    .hbar-fill {
+      height: 100%;
+      max-width: 100%;
+      border-radius: 0 4px 4px 0;
+      background-color: var(--brand);
+      transition: opacity 150ms ease;
+    }
+
+    .hbar-val {
+      text-align: right;
+      color: var(--text);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .hbar:first-child .hbar-val,
+    .hbar:first-child .hbar-label {
+      color: var(--heading);
+      font-weight: 600;
+    }
+
+    /* Heatmap: recruiter shortlisting activity */
+    .heat {
+      display: grid;
+      grid-template-columns: 72px repeat(5, minmax(0, 1fr));
+      gap: 4px;
+      font-size: 12px;
+    }
+
+    .heat-day {
+      text-align: center;
+      color: var(--muted);
+      font-size: 11px;
+      padding-bottom: 2px;
+    }
+
+    .heat-name {
+      color: var(--text);
+      align-self: center;
+      white-space: nowrap;
+    }
+
+    .heat-cell {
+      aspect-ratio: 1.4 / 1;
+      border-radius: 4px;
+      background-color: rgba(215, 66, 66, var(--a));
+      cursor: default;
+    }
+
+    .heat-scale {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 14px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .heat-scale i {
+      width: 14px;
+      height: 10px;
+      border-radius: 2px;
+      background-color: rgba(215, 66, 66, var(--a));
+    }
+
+    /* Stacked bars: position-wise shortlisting */
+    .legend {
+      display: flex;
+      gap: 18px;
+      font-size: 12px;
+      color: var(--text);
+    }
+
+    .legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .legend i {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+    }
+
+    .sw-short { background-color: var(--brand); }
+    .sw-rest  { background-color: #5B6270; }
+
+    .stacks {
+      display: grid;
+      gap: 12px;
+    }
+
+    .stack {
+      display: grid;
+      grid-template-columns: 148px minmax(0, 1fr) 96px;
+      align-items: center;
+      gap: 16px;
+      font-size: 13px;
+      cursor: default;
+    }
+
+    .stack-bar {
+      display: flex;
+      gap: 2px;
+      height: 16px;
+    }
+
+    .stack-bar span {
+      height: 100%;
+      transition: opacity 150ms ease;
+    }
+
+    .stack-bar .seg-short {
+      background-color: var(--brand);
+    }
+
+    .stack-bar .seg-rest {
+      background-color: #5B6270;
+      border-radius: 0 4px 4px 0;
+    }
+
+    .stack-val {
+      text-align: right;
+      color: var(--text);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .stack-val b {
+      color: var(--heading);
+      font-weight: 600;
+    }
+
+    /* Hover: dim siblings, show one tooltip */
+    .hbars:hover .hbar:not(:hover) .hbar-fill,
+    .cols:hover .col:not(:hover) .col-bar,
+    .stacks:hover .stack:not(:hover) .stack-bar span {
+      opacity: 0.4;
+    }
+
+    .heat-cell:hover {
+      outline: 1px solid var(--heading);
+      outline-offset: 1px;
+    }
+
+    .chart-tip {
+      position: fixed;
+      z-index: 20;
+      pointer-events: none;
+      padding: 8px 10px;
+      border-radius: 6px;
+      background-color: #1A2234;
+      border: 1px solid rgba(154, 161, 172, 0.2);
+      box-shadow: 0 8px 24px rgba(4, 7, 14, 0.5);
+      font-size: 12px;
+      line-height: 1.45;
+      color: var(--text);
+      white-space: nowrap;
+      opacity: 0;
+      transform: translateY(4px);
+      transition: opacity 120ms ease, transform 120ms ease;
+    }
+
+    .chart-tip.is-on {
+      opacity: 1;
+      transform: none;
+    }
+
+    .chart-tip b {
+      display: block;
+      color: var(--heading);
+      font-weight: 600;
+    }
+
+    /* =========================================================================
+       7. What is included
+       ========================================================================= */
+    .included-head h2 {
+      font-size: clamp(34px, 4.4vw, 54px);
+      line-height: 1.04;
+      letter-spacing: -0.03em;
+      margin-bottom: 48px;
+    }
+
+    .included-list {
+      list-style: none;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: 64px;
+    }
+
+    .included-item {
+      display: grid;
+      grid-template-columns: 200px minmax(0, 1fr);
+      gap: 24px;
+      padding: 28px 0;
+      border-top: 1px solid var(--line);
+    }
+
+    .included-item h3 {
+      font-size: 18px;
+      margin: 0;
+    }
+
+    .included-item p {
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    /* =========================================================================
+       8. Works with your current system
+       ========================================================================= */
+    .system-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 64px;
+      align-items: center;
+    }
+
+    .system-layout h2,
+    .configured-head h2 {
+      font-size: clamp(34px, 4.4vw, 54px);
+      line-height: 1.04;
+      letter-spacing: -0.03em;
+      margin-bottom: 20px;
+    }
+
+    .system-layout p {
+      max-width: 48ch;
+      text-wrap: pretty;
+    }
+
+    .stack-layers {
+      display: grid;
+      gap: 8px;
+    }
+
+    .layer {
+      padding: 22px 24px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background-color: var(--bg);
+    }
+
+    .layer strong {
+      display: block;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--heading);
+      margin-bottom: 4px;
+    }
+
+    .layer span {
+      font-size: 14px;
+      color: var(--text);
+    }
+
+    .layer.is-new {
+      border-color: rgba(215, 66, 66, 0.5);
+      background-color: rgba(215, 66, 66, 0.08);
+    }
+
+    .layer-note {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 6px;
+      text-align: center;
+    }
+
+    /* =========================================================================
+       9. Configured to how you hire
+       ========================================================================= */
+    .configured-split {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 24px;
+      margin-top: 40px;
+    }
+
+    .configured-col {
+      padding: 32px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+    }
+
+    .configured-col h3 {
+      font-size: 20px;
+    }
+
+    .configured-col.is-fixed h3 {
+      color: var(--muted);
+    }
+
+    .configured-col.is-ours {
+      border-color: rgba(215, 66, 66, 0.5);
+      background-color: var(--surface);
+    }
+
+    /* =========================================================================
+       10. FAQs — Accordion at 760px
+       ========================================================================= */
+    .faq-container {
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .faq-accordion {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-top: 36px;
+    }
+
+    .faq-item {
+      background-color: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,.08);
+    }
+
+    .faq-question {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 24px;
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--heading);
+      cursor: pointer;
+      list-style: none;
+      user-select: none;
+      gap: 16px;
+    }
+
+    .faq-question::-webkit-details-marker {
+      display: none;
+    }
+
+    .faq-icon {
+      font-size: 20px;
+      font-weight: 400;
+      color: var(--brand);
+      line-height: 1;
+      transition: transform 0.25s ease;
+      flex-shrink: 0;
+    }
+
+    .faq-item[open] .faq-icon {
+      transform: rotate(45deg);
+    }
+
+    .faq-answer {
+      padding: 0 24px 22px 24px;
+    }
+
+    .faq-answer p {
+      font-size: 16px;
+      color: var(--text);
+      line-height: 1.65;
+    }
+
+    /* =========================================================================
+       11. Closing CTA — Full-Bleed Brand Band
+       ========================================================================= */
+    .closing-band {
+      text-align: center;
+    }
+
+    .closing-band h2 {
+      color: var(--heading);
+    }
+
+    .closing-line {
+      color: var(--heading);
+      font-size: 19px;
+      margin-left: auto;
+      margin-right: auto;
+      max-width: 680px;
+    }
+
+    .closing-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 32px;
+    }
+
+    /* =========================================================================
+       Responsive Styles
+       ========================================================================= */
+    @media (max-width: 899.98px) {
+      section {
+        padding-top: 72px;
+        padding-bottom: 72px;
+      }
+
+      section.section-short {
+        padding-top: 56px;
+        padding-bottom: 56px;
+      }
+
+      .hero-left {
+        width: 100%;
+      }
+
+      .pile {
+        margin-top: 48px;
+      }
+
+      .pile-legend {
+        flex-direction: column;
+        gap: 6px;
+        margin-bottom: 20px;
+      }
+
+      .pile-legend span:first-child {
+        width: auto;
+      }
+
+      .pile-legend span:last-child {
+        padding-left: 0;
+      }
+
+      .pile-legend span::before {
+        content: "";
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border-radius: 2px;
+        margin-right: 8px;
+        vertical-align: -1px;
+        border: 1px solid var(--line);
+      }
+
+      .pile-legend span:first-child::before {
+        border-color: var(--brand);
+        background-color: rgba(215, 66, 66, 0.25);
+      }
+
+      .read-beats {
+        grid-template-columns: 1fr;
+        gap: 32px;
+        margin-top: 56px;
+      }
+
+      .change-layout {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+
+      .change-intro {
+        position: static;
+      }
+
+      .change-row {
+        grid-template-columns: 1fr;
+        gap: 10px;
+        padding: 28px 0;
+      }
+
+      .change-topic {
+        padding-top: 0;
+      }
+
+      .scoring-layout {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+
+      .reporting-intro {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+
+      .span-7, .span-5, .span-4 {
+        grid-column: span 12;
+      }
+
+      .tile-head {
+        flex-wrap: wrap;
+        row-gap: 6px;
+      }
+
+      .tile-head h3 {
+        flex: 1 1 100%;
+      }
+
+      .legend {
+        flex-wrap: wrap;
+        gap: 6px 16px;
+      }
+
+      .stack {
+        grid-template-columns: 1fr auto;
+        gap: 8px 12px;
+      }
+
+      .stack-bar {
+        grid-column: 1 / -1;
+        grid-row: 2;
+      }
+
+      .weight {
+        grid-template-columns: 100px minmax(0, 1fr) 44px;
+        gap: 12px;
+      }
+
+      .rank-bar, .rank-why, .rank-skills {
+        margin-left: 0;
+      }
+
+      .included-list {
+        grid-template-columns: 1fr;
+      }
+
+      .included-item {
+        grid-template-columns: 1fr;
+        gap: 6px;
+        padding: 22px 0;
+      }
+
+      .system-layout {
+        grid-template-columns: 1fr;
+        gap: 32px;
+      }
+
+      .configured-split {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      .configured-col {
+        padding: 24px;
+      }
+
+      /* How Section: Below 900px single column, panel above text, clickable steps */
+      .how-grid {
+        flex-direction: column !important;
+        gap: 32px !important;
+      }
+
+      .how-panel {
+        order: 1 !important;
+        width: 100% !important;
+      }
+
+      .how-rail {
+        order: 2 !important;
+        width: 100% !important;
+        gap: 12px !important;
+      }
+
+      .how-step {
+        opacity: 0.45;
+        border-left: 2px solid transparent;
+      }
+
+      .how[data-active="1"] .how-step:nth-child(1),
+      .how[data-active="2"] .how-step:nth-child(2),
+      .how[data-active="3"] .how-step:nth-child(3),
+      .how[data-active="4"] .how-step:nth-child(4),
+      .how[data-active="5"] .how-step:nth-child(5) {
+        opacity: 1 !important;
+        border-left: 2px solid var(--brand) !important;
+        background-color: var(--line) !important;
+      }
+
+      .how[data-active="1"] .how-step:nth-child(1) .step-badge,
+      .how[data-active="2"] .how-step:nth-child(2) .step-badge,
+      .how[data-active="3"] .how-step:nth-child(3) .step-badge,
+      .how[data-active="4"] .how-step:nth-child(4) .step-badge,
+      .how[data-active="5"] .how-step:nth-child(5) .step-badge {
+        background-color: var(--brand) !important;
+        color: var(--heading) !important;
+        border-color: var(--brand) !important;
+      }
+    }
+
+    /* Accessibility: prefers-reduced-motion */
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      .btn, .how-step, .how-video-card video, .step-badge, .faq-icon {
+        transition: none !important;
+      }
+
+      .how-grid {
+        flex-direction: column !important;
+        gap: 32px !important;
+      }
+
+      .how-panel {
+        order: 1 !important;
+        width: 100% !important;
+      }
+
+      .how-rail {
+        order: 2 !important;
+        width: 100% !important;
+      }
+
+      .how-step {
+        opacity: 1 !important;
+        border-left: 2px solid var(--brand) !important;
+      }
+
+      .how-step .step-badge {
+        background-color: var(--brand) !important;
+        color: var(--heading) !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 1. Hero — centred, single column -->
+  <section class="hero-section">
+    <div class="container hero-split">
+      <div class="hero-left">
+        <h1>AIQoD ATS</h1>
+        <p class="hero-subline">Resume screening and shortlisting. It reads every application your hiring team receives, scores each one against the role, and gives you a ranked shortlist with the reasoning behind every score.</p>
+        <div class="btn-group">
+          <button class="btn btn-brand" type="button">Book a demo</button>
+          <button class="btn btn-outline" type="button">Talk to our team</button>
+        </div>
+        <p class="hero-trust">Running in production across enterprise hiring teams today.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. Most applications never get read: the pile, then three beats -->
+  <section class="bg-surface read-section">
+    <div class="container">
+      <div class="read-head">
+        <h2>Most applications <em>never get read</em></h2>
+        <p class="read-lead">Hiring teams receive more applications than they can read. Candidates now use AI to apply to more roles in less time, so the volume has gone up. The number of people reading has not.</p>
+      </div>
+
+      <figure class="pile" id="pile">
+        <figcaption class="pile-legend">
+          <span>Read in the time available</span>
+          <span>Arrived, never opened</span>
+        </figcaption>
+        <div class="pile-field">
+          <div class="pile-grid" id="pile-grid" aria-hidden="true"></div>
+          <div class="pile-frame" aria-hidden="true"></div>
+        </div>
+      </figure>
+
+      <div class="read-beats">
+        <div class="beat">
+          <h3>Volume went up</h3>
+          <p>AI lets candidates apply to more roles in less time. The pile grows every week. The team reading it stays the same size.</p>
+        </div>
+        <div class="beat">
+          <h3>Hiring systems do not read</h3>
+          <p>Existing hiring systems store candidates and track them through stages. They do not read resumes. That work is still manual, and it is the step everything else depends on.</p>
+        </div>
+        <div class="beat beat-key">
+          <h3>So the shortlist is a guess</h3>
+          <p>When only part of the pile gets read, the shortlist reflects what there was time for rather than who fits the role best.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. What changes: each old way is struck out and replaced -->
+  <section>
+    <div class="container change-layout">
+      <div class="change-intro">
+        <h2>What changes</h2>
+        <p>What shifts once every application is read and scored the same way.</p>
+        <div class="change-key" aria-hidden="true">
+          <span class="key-now">Now</span>
+          <span class="key-new">With AIQoD ATS</span>
+        </div>
+      </div>
+      <ol class="change-list">
+          <li class="change-row">
+            <span class="change-topic">Coverage</span>
+            <div>
+              <p><span class="change-now"><span class="sr-only">Now: </span>Part of the pile gets read</span></p>
+              <p class="change-new"><span class="sr-only">With AIQoD ATS: </span>Every application gets screened</p>
+            </div>
+          </li>
+          <li class="change-row">
+            <span class="change-topic">Speed</span>
+            <div>
+              <p><span class="change-now"><span class="sr-only">Now: </span>Shortlists wait on someone finding time</span></p>
+              <p class="change-new"><span class="sr-only">With AIQoD ATS: </span>Shortlists are ready as applications arrive</p>
+            </div>
+          </li>
+          <li class="change-row">
+            <span class="change-topic">Explainability</span>
+            <div>
+              <p><span class="change-now"><span class="sr-only">Now: </span>A rejection is hard to explain later</span></p>
+              <p class="change-new"><span class="sr-only">With AIQoD ATS: </span>Every score carries the reasoning behind it</p>
+            </div>
+          </li>
+          <li class="change-row">
+            <span class="change-topic">Recruiter time</span>
+            <div>
+              <p><span class="change-now"><span class="sr-only">Now: </span>Recruiters spend the day reading</span></p>
+              <p class="change-new"><span class="sr-only">With AIQoD ATS: </span>Recruiters spend the day talking to candidates</p>
+            </div>
+          </li>
+          <li class="change-row">
+            <span class="change-topic">Consistency</span>
+            <div>
+              <p><span class="change-now"><span class="sr-only">Now: </span>Two recruiters score the same resume differently</span></p>
+              <p class="change-new"><span class="sr-only">With AIQoD ATS: </span>Scoring stays consistent across roles and recruiters</p>
+            </div>
+          </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 4. How it works — clickable steps section -->
+  <section class="how bg-surface" id="how-it-works" data-active="1">
+    <div class="container how-intro">
+      <h2>How it works</h2>
+      <p class="prose-680">Applications are read as they arrive, turned into searchable records, scored against the role using weights you set, and returned as a ranked shortlist.</p>
+    </div>
+
+    <div class="how-grid container">
+      <div class="how-rail" role="tablist" aria-label="How it works steps">
+        <div class="how-step" data-step="1" role="tab" tabindex="0" aria-selected="true" aria-expanded="true">
+          <div class="how-step-header">
+            <span class="step-badge">1</span>
+            <h3>Resumes are uploaded</h3>
+            <span class="step-chevron" aria-hidden="true"></span>
+          </div>
+          <div class="step-body">
+            <p>Applications go in as a bulk upload. PDF, DOCX and TXT are handled.</p>
+          </div>
+        </div>
+
+        <div class="how-step" data-step="2" role="tab" tabindex="0" aria-selected="false" aria-expanded="false">
+          <div class="how-step-header">
+            <span class="step-badge">2</span>
+            <h3>Everything lands in one table</h3>
+            <span class="step-chevron" aria-hidden="true"></span>
+          </div>
+          <div class="step-body">
+            <p>Each processed resume becomes a record in the candidate dashboard. Every column has its own search, so you can filter on name, phone, email, location, date processed or the parsed summary.</p>
+          </div>
+        </div>
+
+        <div class="how-step" data-step="3" role="tab" tabindex="0" aria-selected="false" aria-expanded="false">
+          <div class="how-step-header">
+            <span class="step-badge">3</span>
+            <h3>The job description sets the scoring</h3>
+            <span class="step-chevron" aria-hidden="true"></span>
+          </div>
+          <div class="step-body">
+            <p>Paste the job description or upload it as a file, then choose the position. Set how much skills, experience and education each count toward the score.</p>
+          </div>
+        </div>
+
+        <div class="how-step" data-step="4" role="tab" tabindex="0" aria-selected="false" aria-expanded="false">
+          <div class="how-step-header">
+            <span class="step-badge">4</span>
+            <h3>Candidates come back ranked</h3>
+            <span class="step-chevron" aria-hidden="true"></span>
+          </div>
+          <div class="step-body">
+            <p>Each candidate returns with a match percentage, years of experience and the skills that produced the score. Shortlist, download or email from the same row.</p>
+          </div>
+        </div>
+
+        <div class="how-step" data-step="5" role="tab" tabindex="0" aria-selected="false" aria-expanded="false">
+          <div class="how-step-header">
+            <span class="step-badge">5</span>
+            <h3>Ask questions in plain language</h3>
+            <span class="step-chevron" aria-hidden="true"></span>
+          </div>
+          <div class="step-body">
+            <p>Ask for candidates in a particular location, candidates above an experience level, or one person's resume. The answer comes back as a filtered list or a direct link to the document.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="how-panel">
+        <div class="how-video-card">
+          <video src="step-1.mp4" muted loop playsinline autoplay preload="metadata"></video>
+          <video src="step-2.mp4" muted loop playsinline autoplay preload="metadata"></video>
+          <video src="step-3.mp4" muted loop playsinline autoplay preload="metadata"></video>
+          <video src="step-4.mp4" muted loop playsinline autoplay preload="metadata"></video>
+          <video src="step-5.mp4" muted loop playsinline autoplay preload="metadata"></video>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. Scoring you can explain: set the weights, watch the shortlist re-rank -->
+  <section id="scoring">
+    <div class="container scoring-layout">
+      <div class="scoring-prose">
+        <h2>Scoring you can explain</h2>
+        <p>You set the weights, not the system. Each result shows the skills that produced the score, so a shortlist can be explained candidate by candidate.</p>
+        <p>Weights are set per role, so a specialist hire and a high-volume hire are not scored on the same basis.</p>
+
+        <div class="weights" id="weights">
+          <p class="weights-title">Try it: set the weights for a role</p>
+          <div class="role-switch" role="group" aria-label="Role type">
+            <button type="button" data-preset="specialist" aria-pressed="true">Specialist hire</button>
+            <button type="button" data-preset="volume" aria-pressed="false">High-volume hire</button>
+          </div>
+          <div class="weight">
+            <label for="w-skills"><span class="weight-swatch f-skills"></span>Skills</label>
+            <input type="range" id="w-skills" min="0" max="100" step="5" value="60" style="--swatch: var(--brand)">
+            <output for="w-skills" id="o-skills">60%</output>
+          </div>
+          <div class="weight">
+            <label for="w-exp"><span class="weight-swatch f-exp"></span>Experience</label>
+            <input type="range" id="w-exp" min="0" max="100" step="5" value="25" style="--swatch: #C9CDD4">
+            <output for="w-exp" id="o-exp">25%</output>
+          </div>
+          <div class="weight">
+            <label for="w-edu"><span class="weight-swatch f-edu"></span>Education</label>
+            <input type="range" id="w-edu" min="0" max="100" step="5" value="15" style="--swatch: #5B6270">
+            <output for="w-edu" id="o-edu">15%</output>
+          </div>
+          <p class="weights-note">Weights are shown as a share of the total score.</p>
+        </div>
+      </div>
+
+      <div class="ranking">
+        <div class="ranking-head">
+          <strong>Ranked shortlist</strong>
+          <span>Example candidates</span>
+        </div>
+        <ol class="ranking-list" id="ranking-list" aria-live="polite"></ol>
+        <p class="ranking-foot">Every score breaks down into the factors you weighted, so the ranking can be explained line by line.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. Reporting: one tile per report the dashboard ships with -->
+  <section class="bg-surface" id="reporting">
+    <div class="container">
+      <div class="reporting-intro">
+        <div>
+          <h2>Reporting</h2>
+          <p>Alongside individual roles, the dashboard shows the shape of the whole pipeline: where candidates are, what they know, and how shortlisting is moving.</p>
+        </div>
+        <span class="report-note">Example data. Hover any chart for detail.</span>
+      </div>
+
+      <div class="report-grid" id="report-grid">
+        <figure class="report-tile span-7">
+          <div class="tile-head">
+            <h3>Job description upload trend</h3>
+            <span class="tile-sub">Last 12 weeks</span>
+          </div>
+          <div class="tile-figure" id="jd-figure"></div>
+          <div class="line-chart" id="jd-chart"></div>
+          <div class="axis-x" id="jd-axis"></div>
+        </figure>
+
+        <figure class="report-tile span-5">
+          <div class="tile-head">
+            <h3>Experience level distribution</h3>
+            <span class="tile-sub">Candidates, years</span>
+          </div>
+          <div class="cols" id="exp-chart"></div>
+          <div class="cols-x" id="exp-axis"></div>
+        </figure>
+
+        <figure class="report-tile span-4">
+          <div class="tile-head">
+            <h3>Top skills across the pool</h3>
+            <span class="tile-sub">Candidates</span>
+          </div>
+          <div class="hbars" id="skills-chart"></div>
+        </figure>
+
+        <figure class="report-tile span-4">
+          <div class="tile-head">
+            <h3>Candidates by location</h3>
+            <span class="tile-sub">Candidates</span>
+          </div>
+          <div class="hbars" id="loc-chart"></div>
+        </figure>
+
+        <figure class="report-tile span-4">
+          <div class="tile-head">
+            <h3>Recruiter shortlisting activity</h3>
+            <span class="tile-sub">Shortlists this week</span>
+          </div>
+          <div class="heat" id="heat-chart"></div>
+          <div class="heat-scale" aria-hidden="true">Fewer <i style="--a:.15"></i><i style="--a:.35"></i><i style="--a:.6"></i><i style="--a:.85"></i><i style="--a:1"></i> More</div>
+        </figure>
+
+        <figure class="report-tile span-12">
+          <div class="tile-head">
+            <h3>Position-wise shortlisting</h3>
+            <div class="legend" aria-hidden="true">
+              <span><i class="sw-short"></i>Shortlisted</span>
+              <span><i class="sw-rest"></i>Screened, not shortlisted</span>
+            </div>
+          </div>
+          <div class="stacks" id="pos-chart"></div>
+        </figure>
+      </div>
+      <div class="chart-tip" id="chart-tip" role="presentation"></div>
+    </div>
+  </section>
+
+  <!-- 7. What is included: a plain two-column list -->
+  <section>
+    <div class="container">
+      <div class="included-head">
+        <h2>What is included</h2>
+      </div>
+      <ul class="included-list">
+        <li class="included-item">
+          <h3>Resume intake</h3>
+          <p>Bulk upload, PDF, DOCX and TXT</p>
+        </li>
+        <li class="included-item">
+          <h3>Candidate dashboard</h3>
+          <p>Every processed application in one table, independent search on each column</p>
+        </li>
+        <li class="included-item">
+          <h3>JD matching</h3>
+          <p>Job description pasted or uploaded, position selected, weighted scoring across skills, experience and education</p>
+        </li>
+        <li class="included-item">
+          <h3>Ranked results</h3>
+          <p>Match percentage per candidate, years of experience, top skills, download, email and shortlist actions</p>
+        </li>
+        <li class="included-item">
+          <h3>Reporting</h3>
+          <p>Location, skills, experience distribution, shortlisting activity, JD upload trend, position-wise shortlisting</p>
+        </li>
+        <li class="included-item">
+          <h3>Assistant</h3>
+          <p>Questions in plain language across the candidate pool, answered as filtered lists or resume links</p>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 8. Works with your current system: screening sits on top, nothing moves -->
+  <section class="bg-surface section-short">
+    <div class="container system-layout">
+      <div>
+        <h2>Works with your current system</h2>
+        <p>Your current hiring system keeps storing candidates and tracking them through stages. AIQoD ATS adds the screening on top of it. Nothing gets replaced and nothing gets migrated.</p>
+      </div>
+      <div class="stack-layers" aria-hidden="true">
+        <div class="layer is-new">
+          <strong>AIQoD ATS</strong>
+          <span>Reads, scores and ranks every application</span>
+        </div>
+        <div class="layer">
+          <strong>Your current hiring system</strong>
+          <span>Candidate records, stages and tracking stay where they are</span>
+        </div>
+        <p class="layer-note">Added on top. Nothing replaced.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9. Configured to how you hire: fixed software against configured -->
+  <section>
+    <div class="container">
+      <div class="configured-head">
+        <h2>Configured to how you hire</h2>
+      </div>
+      <div class="configured-split">
+        <div class="configured-col is-fixed">
+          <h3>Fixed software</h3>
+          <p>Most screening tools decide for you what matters in a resume. The scoring model is fixed, the fields are fixed, and the reports are whatever the vendor built.</p>
+        </div>
+        <div class="configured-col is-ours">
+          <h3>Configured</h3>
+          <p>Which fields get pulled out of a resume, how the weights work, what the reports show and what the assistant can answer are all set to your process. When the way you hire changes, the configuration changes. It does not become a feature request sitting in someone's backlog.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10. FAQs — accordion at 760px -->
+  <section class="bg-surface">
+    <div class="container faq-container prose-760">
+      <h2>FAQs</h2>
+      <div class="faq-accordion">
+        <details class="faq-item">
+          <summary class="faq-question">
+            <span>Does it work with the hiring system we already use?</span>
+            <span class="faq-icon" aria-hidden="true">+</span>
+          </summary>
+          <div class="faq-answer">
+            <p>Yes. It screens on top of an existing system. Candidate records, stages and tracking stay where they are.</p>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary class="faq-question">
+            <span>What file formats can it read?</span>
+            <span class="faq-icon" aria-hidden="true">+</span>
+          </summary>
+          <div class="faq-answer">
+            <p>PDF, DOCX and TXT.</p>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary class="faq-question">
+            <span>How is the match score calculated?</span>
+            <span class="faq-icon" aria-hidden="true">+</span>
+          </summary>
+          <div class="faq-answer">
+            <p>Against the job description, using weights set per role across skills, experience and education. The skills that drove the score are shown with the result.</p>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary class="faq-question">
+            <span>Can we change the scoring weights?</span>
+            <span class="faq-icon" aria-hidden="true">+</span>
+          </summary>
+          <div class="faq-answer">
+            <p>Yes. They are set by your team and configured per role.</p>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary class="faq-question">
+            <span>What can the assistant answer?</span>
+            <span class="faq-icon" aria-hidden="true">+</span>
+          </summary>
+          <div class="faq-answer">
+            <p>Questions across the candidate pool in plain language, such as candidates in a given location or above an experience level. Answers come back as a filtered list or a link to the resume.</p>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary class="faq-question">
+            <span>How long does it take to go live?</span>
+            <span class="faq-icon" aria-hidden="true">+</span>
+          </summary>
+          <div class="faq-answer">
+            <p>The first configuration goes live in a day, with measurable results typically inside three to six weeks.</p>
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- 11. Closing CTA — full-bleed brand band -->
+  <section class="bg-brand closing-band">
+    <div class="container prose-680">
+      <h2>Book a demo</h2>
+      <p class="closing-line">Bring a live role and a set of applications. Twenty minutes is enough to see how it scores them.</p>
+      <div class="closing-buttons">
+        <button class="btn btn-contrast-solid" type="button">Book a demo</button>
+        <button class="btn btn-contrast-outline" type="button">Talk to our team</button>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    (function() {
+      // 1. The pile: one tile per application. Only the first few columns fit inside the read frame.
+      document.documentElement.classList.add('js');
+      var pile = document.getElementById('pile');
+      var pileGrid = document.getElementById('pile-grid');
+      if (pile && pileGrid) {
+        var ROWS = 6;
+        var builtCols = 0;
+
+        function layoutFor(width) {
+          if (width < 600) return { cols: 14, n: 3, gap: 4 };
+          if (width < 900) return { cols: 22, n: 4, gap: 5 };
+          return { cols: 32, n: 5, gap: 6 };
+        }
+
+        function buildPile() {
+          var l = layoutFor(window.innerWidth);
+          if (l.cols === builtCols) return;
+          builtCols = l.cols;
+          pile.style.setProperty('--cols', l.cols);
+          pile.style.setProperty('--n', l.n);
+          pile.style.setProperty('--gap', l.gap + 'px');
+          var frag = document.createDocumentFragment();
+          for (var r = 0; r < ROWS; r++) {
+            for (var c = 0; c < l.cols; c++) {
+              var tile = document.createElement('div');
+              tile.className = c < l.n ? 'tile is-read' : 'tile';
+              // Read tiles land first, then the rest of the pile streams in left to right
+              var delay = c < l.n ? (c * 40 + r * 20) : (300 + (c - l.n) * 28 + r * 14 + Math.random() * 60);
+              tile.style.setProperty('--d', Math.round(delay) + 'ms');
+              frag.appendChild(tile);
+            }
+          }
+          pileGrid.innerHTML = '';
+          pileGrid.appendChild(frag);
+        }
+
+        buildPile();
+        var resizeTimer;
+        window.addEventListener('resize', function() {
+          clearTimeout(resizeTimer);
+          resizeTimer = setTimeout(buildPile, 150);
+        });
+
+        if ('IntersectionObserver' in window) {
+          var pileObserver = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry) {
+              if (entry.isIntersecting) {
+                pile.classList.add('is-in');
+                pileObserver.disconnect();
+              }
+            });
+          }, { threshold: 0.35 });
+          pileObserver.observe(pile);
+        } else {
+          pile.classList.add('is-in');
+        }
+      }
+
+      // What changes: strike the old way, then reveal the new one, row by row
+      var changeRows = document.querySelectorAll('.change-row');
+      if ('IntersectionObserver' in window) {
+        var changeObserver = new IntersectionObserver(function(entries) {
+          entries.forEach(function(entry) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-in');
+              changeObserver.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.6 });
+        changeRows.forEach(function(row) { changeObserver.observe(row); });
+      } else {
+        changeRows.forEach(function(row) { row.classList.add('is-in'); });
+      }
+
+      // Scoring: the weights you set re-score and re-rank example candidates
+      var rankList = document.getElementById('ranking-list');
+      var weightsBox = document.getElementById('weights');
+      if (rankList && weightsBox) {
+        var FACTORS = [
+          { key: 'skills', label: 'Skills', cls: 'f-skills' },
+          { key: 'exp', label: 'Experience', cls: 'f-exp' },
+          { key: 'edu', label: 'Education', cls: 'f-edu' }
+        ];
+        var CANDIDATES = [
+          { id: 'a', name: 'Candidate A', meta: '10 yrs', fit: { skills: 0.84, exp: 0.60, edu: 0.60 }, skills: ['Python', 'SQL', 'Airflow', 'dbt'] },
+          { id: 'b', name: 'Candidate B', meta: '14 yrs', fit: { skills: 0.62, exp: 0.95, edu: 0.50 }, skills: ['Java', 'Spring', 'Kafka'] },
+          { id: 'c', name: 'Candidate C', meta: '4 yrs', fit: { skills: 0.78, exp: 0.40, edu: 0.95 }, skills: ['Python', 'PyTorch', 'MLOps'] }
+        ];
+        var PRESETS = {
+          specialist: { skills: 60, exp: 25, edu: 15 },
+          volume: { skills: 35, exp: 45, edu: 20 }
+        };
+        var inputs = {};
+        FACTORS.forEach(function(f) { inputs[f.key] = document.getElementById('w-' + f.key); });
+        var presetButtons = weightsBox.querySelectorAll('[data-preset]');
+        var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+        // One card per candidate, built once and re-ordered on every change
+        var cards = {};
+        CANDIDATES.forEach(function(c) {
+          var li = document.createElement('li');
+          li.className = 'rank-card';
+          li.innerHTML =
+            '<div class="rank-top"><span class="rank-pos"></span>' +
+            '<span class="rank-name">' + c.name + '<span class="rank-meta">' + c.meta + '</span></span>' +
+            '<span class="rank-score"></span></div>' +
+            '<div class="rank-bar" aria-hidden="true">' +
+            FACTORS.map(function(f) { return '<span class="' + f.cls + '"></span>'; }).join('') + '</div>' +
+            '<p class="rank-why"></p>' +
+            '<div class="rank-skills">' + c.skills.map(function(sk) { return '<span>' + sk + '</span>'; }).join('') + '</div>';
+          cards[c.id] = li;
+          rankList.appendChild(li);
+        });
+
+        function weights() {
+          var raw = {}, total = 0;
+          FACTORS.forEach(function(f) { raw[f.key] = +inputs[f.key].value; total += raw[f.key]; });
+          var w = {};
+          FACTORS.forEach(function(f) { w[f.key] = total ? raw[f.key] / total : 1 / FACTORS.length; });
+          return w;
+        }
+
+        function render(animate) {
+          var w = weights();
+          FACTORS.forEach(function(f) {
+            document.getElementById('o-' + f.key).textContent = Math.round(w[f.key] * 100) + '%';
+          });
+
+          var scored = CANDIDATES.map(function(c) {
+            var parts = {}, total = 0;
+            FACTORS.forEach(function(f) {
+              parts[f.key] = c.fit[f.key] * w[f.key] * 100;
+              total += parts[f.key];
+            });
+            return { c: c, parts: parts, total: total };
+          }).sort(function(x, y) { return y.total - x.total; });
+
+          // FLIP: remember where each card sat before re-ordering
+          var before = {};
+          scored.forEach(function(r) { before[r.c.id] = cards[r.c.id].getBoundingClientRect().top; });
+
+          scored.forEach(function(r, i) {
+            var card = cards[r.c.id];
+            card.classList.toggle('is-top', i === 0);
+            card.querySelector('.rank-pos').textContent = i + 1;
+            card.querySelector('.rank-score').innerHTML = Math.round(r.total) + '<small>%</small>';
+            var bars = card.querySelectorAll('.rank-bar span');
+            FACTORS.forEach(function(f, j) { bars[j].style.width = r.parts[f.key] + '%'; });
+            card.querySelector('.rank-why').innerHTML = FACTORS.map(function(f) {
+              return f.label + ' <b>' + Math.round(r.parts[f.key]) + '</b> of ' + Math.round(w[f.key] * 100);
+            }).join(', ');
+            rankList.appendChild(card);
+          });
+
+          if (!animate || reduceMotion.matches) return;
+          scored.forEach(function(r) {
+            var card = cards[r.c.id];
+            var delta = before[r.c.id] - card.getBoundingClientRect().top;
+            if (!delta) return;
+            card.style.transition = 'none';
+            card.style.transform = 'translateY(' + delta + 'px)';
+            requestAnimationFrame(function() {
+              requestAnimationFrame(function() {
+                card.style.transition = 'transform 500ms cubic-bezier(0.16, 1, 0.3, 1), border-color 300ms ease';
+                card.style.transform = '';
+              });
+            });
+          });
+        }
+
+        function setPreset(name) {
+          var preset = PRESETS[name];
+          FACTORS.forEach(function(f) { inputs[f.key].value = preset[f.key]; });
+          presetButtons.forEach(function(btn) { btn.setAttribute('aria-pressed', btn.dataset.preset === name ? 'true' : 'false'); });
+          render(true);
+        }
+
+        presetButtons.forEach(function(btn) {
+          btn.addEventListener('click', function() { setPreset(btn.dataset.preset); });
+        });
+        FACTORS.forEach(function(f) {
+          inputs[f.key].addEventListener('input', function() {
+            presetButtons.forEach(function(btn) { btn.setAttribute('aria-pressed', 'false'); });
+            render(true);
+          });
+        });
+
+        render();
+      }
+
+      // Reporting: small charts built from example data, one shared tooltip
+      var reportGrid = document.getElementById('report-grid');
+      if (reportGrid) {
+        var tip = document.getElementById('chart-tip');
+        var fmt = function(n) { return n.toLocaleString('en-IN'); };
+
+        function bindTip(el, html) {
+          el.addEventListener('mouseenter', function() { tip.innerHTML = html(); tip.classList.add('is-on'); });
+          el.addEventListener('mousemove', function(e) {
+            var x = e.clientX + 14, y = e.clientY - tip.offsetHeight - 12;
+            if (x + tip.offsetWidth > window.innerWidth - 8) x = e.clientX - tip.offsetWidth - 14;
+            if (y < 8) y = e.clientY + 18;
+            tip.style.left = x + 'px';
+            tip.style.top = y + 'px';
+          });
+          el.addEventListener('mouseleave', function() { tip.classList.remove('is-on'); });
+        }
+
+        function srTable(container, caption, head, rows) {
+          var wrap = document.createElement('div');
+          wrap.className = 'sr-only';
+          var t = document.createElement('table');
+          wrap.appendChild(t);
+          t.innerHTML = '<caption>' + caption + '</caption><tr>' + head.map(function(h) { return '<th>' + h + '</th>'; }).join('') + '</tr>' +
+            rows.map(function(r) { return '<tr>' + r.map(function(c) { return '<td>' + c + '</td>'; }).join('') + '</tr>'; }).join('');
+          container.parentNode.appendChild(wrap);
+          container.setAttribute('aria-hidden', 'true');
+        }
+
+        // 1. Job description uploads: line with crosshair
+        var jd = [4, 6, 5, 9, 7, 11, 8, 12, 10, 14, 13, 17];
+        var jdChart = document.getElementById('jd-chart');
+        var jdTotal = jd.reduce(function(a, b) { return a + b; }, 0);
+        document.getElementById('jd-figure').innerHTML = jdTotal + '<small>job descriptions uploaded</small>';
+        var jdMax = 20, W = 600, H = 168;
+        var px = function(i) { return i / (jd.length - 1) * W; };
+        var py = function(v) { return H - v / jdMax * H; };
+        var pts = jd.map(function(v, i) { return px(i).toFixed(1) + ',' + py(v).toFixed(1); });
+        jdChart.innerHTML =
+          '<svg viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none">' +
+          '<g class="line-grid">' + [0, 5, 10, 15, 20].map(function(g) { return '<line x1="0" x2="' + W + '" y1="' + py(g) + '" y2="' + py(g) + '"></line>'; }).join('') + '</g>' +
+          '<polygon class="line-area" points="0,' + H + ' ' + pts.join(' ') + ' ' + W + ',' + H + '"></polygon>' +
+          '<polyline class="line-path" points="' + pts.join(' ') + '"></polyline></svg>' +
+          '<span class="line-dot" style="left:100%;top:' + (py(jd[jd.length - 1]) / H * 100) + '%"></span>' +
+          '<span class="line-cross"></span><span class="line-dot is-hover"></span>' +
+          '<div class="line-hits">' + jd.map(function() { return '<span></span>'; }).join('') + '</div>';
+        var cross = jdChart.querySelector('.line-cross');
+        var hoverDot = jdChart.querySelector('.line-dot.is-hover');
+        jdChart.querySelectorAll('.line-hits span').forEach(function(hit, i) {
+          hit.addEventListener('mouseenter', function() {
+            var left = (i / (jd.length - 1) * 100) + '%';
+            cross.style.left = left;
+            hoverDot.style.left = left;
+            hoverDot.style.top = (py(jd[i]) / H * 100) + '%';
+            jdChart.classList.add('is-hovering');
+          });
+          bindTip(hit, function() { return '<b>Week ' + (i + 1) + '</b>' + jd[i] + ' job descriptions'; });
+        });
+        jdChart.addEventListener('mouseleave', function() { jdChart.classList.remove('is-hovering'); });
+        document.getElementById('jd-axis').innerHTML = '<span>Week 1</span><span>Week 4</span><span>Week 8</span><span>Week 12</span>';
+        srTable(jdChart, 'Job description uploads per week', ['Week', 'Uploads'], jd.map(function(v, i) { return [i + 1, v]; }));
+
+        // 2. Experience levels: columns
+        var exp = [['0-2', 186], ['3-5', 342], ['6-9', 271], ['10-14', 148], ['15+', 63]];
+        var expMax = 400;
+        var expChart = document.getElementById('exp-chart');
+        var expPeak = Math.max.apply(null, exp.map(function(d) { return d[1]; }));
+        exp.forEach(function(d) {
+          var col = document.createElement('div');
+          col.className = 'col' + (d[1] === expPeak ? ' is-peak' : '');
+          col.innerHTML = '<span class="col-val">' + d[1] + '</span><span class="col-bar" style="height:' + (d[1] / expMax * 100) + '%"></span>';
+          bindTip(col, function() { return '<b>' + d[0] + ' years</b>' + fmt(d[1]) + ' candidates'; });
+          expChart.appendChild(col);
+        });
+        document.getElementById('exp-axis').innerHTML = exp.map(function(d) { return '<span>' + d[0] + '</span>'; }).join('');
+        srTable(expChart, 'Candidates by years of experience', ['Years', 'Candidates'], exp);
+
+        // 3 and 4. Skills and locations: horizontal bars, largest first
+        function hbars(id, data, noun, caption) {
+          var el = document.getElementById(id);
+          var max = data[0][1];
+          data.forEach(function(d) {
+            var row = document.createElement('div');
+            row.className = 'hbar';
+            row.innerHTML = '<span class="hbar-label">' + d[0] + '</span><span class="hbar-track"><span class="hbar-fill" style="width:' + (d[1] / max * 100) + '%;display:block"></span></span><span class="hbar-val">' + d[1] + '</span>';
+            bindTip(row, function() { return '<b>' + d[0] + '</b>' + fmt(d[1]) + ' ' + noun; });
+            el.appendChild(row);
+          });
+          srTable(el, caption, ['Name', 'Candidates'], data);
+        }
+        hbars('skills-chart', [['Python', 412], ['SQL', 368], ['Java', 247], ['AWS', 221], ['React', 189], ['Kubernetes', 134]], 'candidates', 'Top skills across the candidate pool');
+        hbars('loc-chart', [['Bengaluru', 384], ['Hyderabad', 261], ['Pune', 198], ['Chennai', 152], ['Mumbai', 117], ['Remote', 96]], 'candidates', 'Candidates by location');
+
+        // 5. Recruiter activity: heatmap, one hue light to dark
+        var days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+        var recruiters = [['Recruiter A', [6, 9, 4, 11, 7]], ['Recruiter B', [3, 5, 8, 6, 2]], ['Recruiter C', [10, 12, 9, 14, 8]], ['Recruiter D', [2, 4, 3, 5, 6]]];
+        var heatMax = 14;
+        var heat = document.getElementById('heat-chart');
+        heat.innerHTML = '<span></span>' + days.map(function(d) { return '<span class="heat-day">' + d + '</span>'; }).join('');
+        recruiters.forEach(function(r) {
+          var name = document.createElement('span');
+          name.className = 'heat-name';
+          name.textContent = r[0];
+          heat.appendChild(name);
+          r[1].forEach(function(v, i) {
+            var cell = document.createElement('span');
+            cell.className = 'heat-cell';
+            cell.style.setProperty('--a', (0.12 + 0.88 * v / heatMax).toFixed(2));
+            bindTip(cell, function() { return '<b>' + r[0] + ', ' + days[i] + '</b>' + v + ' shortlisted'; });
+            heat.appendChild(cell);
+          });
+        });
+        srTable(heat, 'Shortlists per recruiter per day', ['Recruiter'].concat(days), recruiters.map(function(r) { return [r[0]].concat(r[1]); }));
+
+        // 6. Position-wise shortlisting: shortlisted vs the rest of the screened pool
+        var positions = [['Data Engineer', 412, 38], ['Backend Developer', 356, 41], ['Product Analyst', 274, 19], ['QA Engineer', 233, 27], ['ML Engineer', 198, 22]];
+        var posMax = 412;
+        var pos = document.getElementById('pos-chart');
+        positions.forEach(function(d) {
+          var row = document.createElement('div');
+          row.className = 'stack';
+          var w = d[1] / posMax * 100;
+          row.innerHTML = '<span class="hbar-label">' + d[0] + '</span>' +
+            '<span class="stack-bar" style="width:' + w + '%"><span class="seg-short" style="flex:' + d[2] + ' 1 0"></span><span class="seg-rest" style="flex:' + (d[1] - d[2]) + ' 1 0"></span></span>' +
+            '<span class="stack-val"><b>' + d[2] + '</b> of ' + d[1] + '</span>';
+          bindTip(row, function() { return '<b>' + d[0] + '</b>' + d[2] + ' shortlisted from ' + d[1] + ' screened (' + (d[2] / d[1] * 100).toFixed(1) + '%)'; });
+          pos.appendChild(row);
+        });
+        srTable(pos, 'Shortlisted and screened candidates by position', ['Position', 'Screened', 'Shortlisted'], positions);
+      }
+
+      // 2. Accessibility: prefers-reduced-motion
+      var motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+      function handleReducedMotion(matches) {
+        if (matches) {
+          document.querySelectorAll('video').forEach(function(video) {
+            video.pause();
+            video.removeAttribute('autoplay');
+            video.currentTime = 0.1;
+          });
+        }
+      }
+      handleReducedMotion(motionQuery.matches);
+      motionQuery.addEventListener('change', function(e) {
+        handleReducedMotion(e.matches);
+      });
+
+      // 3. Section 4 Clickable Steps Interaction
+      var howSection = document.getElementById('how-it-works');
+      var stepItems = document.querySelectorAll('.how-rail .how-step');
+      var videos = document.querySelectorAll('.how-video-card video');
+
+      stepItems.forEach(function(stepEl, idx) {
+        function activateStep() {
+          var stepNum = String(idx + 1);
+          if (howSection) {
+            howSection.setAttribute('data-active', stepNum);
+          }
+          
+          stepItems.forEach(function(el, sIdx) {
+            var isActive = (sIdx === idx);
+            el.setAttribute('aria-selected', isActive ? 'true' : 'false');
+            el.setAttribute('aria-expanded', isActive ? 'true' : 'false');
+          });
+
+          videos.forEach(function(vid, vIdx) {
+            if (vIdx === idx) {
+              if (vid.paused && !motionQuery.matches) {
+                vid.play().catch(function() {});
+              }
+            }
+          });
+        }
+
+        stepEl.addEventListener('click', activateStep);
+
+        stepEl.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            activateStep();
+          }
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
